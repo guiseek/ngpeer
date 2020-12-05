@@ -28,6 +28,13 @@
     },
     "client": {
       "tags": ["side:client"]
+    },
+    "client-group": {
+      "tags": ["side:client"]
+    },
+    "client-group-e2e": {
+      "tags": [],
+      "implicitDependencies": ["client-group"]
     }
   }
 }
