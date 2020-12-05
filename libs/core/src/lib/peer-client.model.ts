@@ -2,6 +2,7 @@ import { Immutable } from './immutable.model'
 
 export interface IPeerClient {
   id?: string
+  controls?: boolean
   stream: MediaStream
 }
 
@@ -18,11 +19,19 @@ export class PeerClient extends Immutable<IPeerClient, PeerClient> {
     return this.data.get('stream')
   }
 
+  get controls(): boolean {
+    return this.data.get('controls')
+  }
+
   setId(val: string): PeerClient {
     return this.setValue('id', val)
   }
 
   setStream(val: MediaStream): PeerClient {
     return this.setValue('stream', val)
+  }
+
+  setControls(val: boolean): PeerClient {
+    return this.setValue('controls', val)
   }
 }

@@ -139,7 +139,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "client-group:build"
+            "browserTarget": "client-group:build",
+            "proxyConfig": "apps/client/group/proxy.conf.json"
           },
           "configurations": {
             "production": {
@@ -193,6 +194,56 @@
           }
         }
       }
+    },
+    "server-group": {
+      "root": "apps/server/group",
+      "sourceRoot": "apps/server/group/src",
+      "projectType": "application",
+      "prefix": "server-group",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/server/group",
+            "main": "apps/server/group/src/main.ts",
+            "tsConfig": "apps/server/group/tsconfig.app.json",
+            "assets": ["apps/server/group/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/server/group/src/environments/environment.ts",
+                  "with": "apps/server/group/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "server-group:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/server/group/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/server/group/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {
@@ -207,5 +258,6 @@
       "unitTestRunner": "jest",
       "strict": true
     }
-  }
+  },
+  "defaultProject": "server-group"
 }

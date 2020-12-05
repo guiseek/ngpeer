@@ -35,6 +35,9 @@
     "client-group-e2e": {
       "tags": [],
       "implicitDependencies": ["client-group"]
+    },
+    "server-group": {
+      "tags": ["side:server"]
     }
   }
 }

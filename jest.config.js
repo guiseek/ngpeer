@@ -3,5 +3,6 @@ module.exports = {
     '<rootDir>/libs/core',
     '<rootDir>/libs/client',
     '<rootDir>/apps/client/group',
+    '<rootDir>/apps/server/group',
   ],
 }
