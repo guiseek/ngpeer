@@ -30,7 +30,7 @@ import { LoaderComponent } from './loader/loader.component'
     MatSidenavModule,
     MatGridListModule,
     ReactiveFormsModule,
-    ClientModule.forRoot('http://localhost:3000'),
+    ClientModule.forRoot('https://ngpeer.vercel.app'),
     RouterModule.forRoot([], { initialNavigation: 'enabled', relativeLinkResolution: 'legacy' }),
     BrowserAnimationsModule,
   ],
