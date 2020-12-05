@@ -31,6 +31,48 @@
           }
         }
       }
+    },
+    "client": {
+      "projectType": "library",
+      "root": "libs/client",
+      "sourceRoot": "libs/client/src",
+      "prefix": "ngpeer",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/angular:package",
+          "options": {
+            "tsConfig": "libs/client/tsconfig.lib.json",
+            "project": "libs/client/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/client/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/client/tsconfig.lib.json",
+              "libs/client/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/client/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/client/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
     }
   },
   "cli": {
@@ -42,7 +84,8 @@
       "e2eTestRunner": "cypress"
     },
     "@nrwl/angular:library": {
-      "unitTestRunner": "jest"
+      "unitTestRunner": "jest",
+      "strict": true
     }
   }
 }
