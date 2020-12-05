@@ -2,6 +2,8 @@ import { Immutable } from './immutable.model'
 
 export interface IPeerClient {
   id?: string
+  owner?: boolean
+  muted?: boolean
   controls?: boolean
   stream: MediaStream
 }
@@ -23,6 +25,10 @@ export class PeerClient extends Immutable<IPeerClient, PeerClient> {
     return this.data.get('controls')
   }
 
+  get muted(): boolean {
+    return this.data.get('muted')
+  }
+
   setId(val: string): PeerClient {
     return this.setValue('id', val)
   }
@@ -33,5 +39,17 @@ export class PeerClient extends Immutable<IPeerClient, PeerClient> {
 
   setControls(val: boolean): PeerClient {
     return this.setValue('controls', val)
+  }
+
+  setMuted(val: boolean): PeerClient {
+    return this.setValue('muted', val)
+  }
+}
+
+declare global {
+  interface RTCPeerConnection {
+    onaddstream: (evt: MediaStreamEvent) => void
+    onremovestream: (evt: Event) => void
+    addStream(stream: MediaStream): void
   }
 }

@@ -1,24 +1,41 @@
 <mat-toolbar color="primary">
-  <i class="material-icons">local_fire_department</i>
-  <h1>@ngpeer</h1>
+  <button type="button" mat-icon-button (click)="drawer.toggle()">
+    <mat-icon color="accent">local_fire_department</mat-icon>
+  </button>
+  <h1>{{ title }}</h1>
 
   <span class="spacer"></span>
 
   <button mat-raised-button color="accent" (click)="connect()">Entrar</button>
 </mat-toolbar>
 
-<mat-drawer-container
-  class="example-container"
-  [hasBackdrop]="true"
->
+<mat-drawer-container class="drawer-container" [hasBackdrop]="true">
+  <mat-drawer #drawer mode="over">
+    <h3 class="mat-h3">Configurações</h3>
+  </mat-drawer>
   <mat-drawer-content>
-    <mat-grid-list cols="2" rowHeight="2:1">
-      <mat-grid-tile *ngFor="let client of peerClients">
-        <video controls autoplay [srcObject]="client.stream"></video>
-      </mat-grid-tile>
-    </mat-grid-list>
+    <ng-container *ngIf="peerClients$ | async as clients">
+      <mat-grid-list [cols]="2" rowHeight="2:1" *ngIf="!!clients.length; else globe">
+        <mat-grid-tile *ngFor="let client of clients">
+          <video
+            [id]="client.id"
+            [muted]="true"
+            [controls]="client.controls"
+            autoplay
+            [srcObject]="client.stream"
+          ></video>
+          <!-- <label [for]="client.id">{{ client.controls }}</label> -->
+        </mat-grid-tile>
+      </mat-grid-list>
+      <ng-template #globe>
+        <button mat-raised-button color="accent" (click)="connect()">Entrar</button>
+      </ng-template>
+    </ng-container>
+
   </mat-drawer-content>
 </mat-drawer-container>
+
+<sample-loader></sample-loader>
 
 <mat-toolbar color="primary" class="footer">
   <p>Guilherme 2020 &copy; email@guiseek.dev</p>

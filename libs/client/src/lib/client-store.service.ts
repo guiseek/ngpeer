@@ -14,7 +14,8 @@ export class ClientStoreService {
   }
 
   public addClient(newClient: PeerClient): void {
-    this._clients.next(this._clients.getValue().push(newClient))
+    const clients = this._clients.getValue()
+    this._clients.next(clients.push(newClient))
   }
 
   public removeClient(clientId: string): void {

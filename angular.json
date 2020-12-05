@@ -109,8 +109,8 @@
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "apps/client/group/src/environments/environment.ts",
-                  "with": "apps/client/group/src/environments/environment.prod.ts"
+                  "replace": "apps/client/group/src/envs/env.ts",
+                  "with": "apps/client/group/src/envs/env.prod.ts"
                 }
               ],
               "optimization": true,
@@ -217,8 +217,8 @@
               "inspect": false,
               "fileReplacements": [
                 {
-                  "replace": "apps/server/group/src/environments/environment.ts",
-                  "with": "apps/server/group/src/environments/environment.prod.ts"
+                  "replace": "apps/server/group/src/envs/env.ts",
+                  "with": "apps/server/group/src/envs/env.prod.ts"
                 }
               ]
             }
