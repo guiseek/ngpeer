@@ -31,7 +31,7 @@ import { LoaderComponent } from './loader/loader.component'
     MatGridListModule,
     ReactiveFormsModule,
     ClientModule.forRoot('http://localhost:3000'),
-    RouterModule.forRoot([], { initialNavigation: 'enabled' }),
+    RouterModule.forRoot([], { initialNavigation: 'enabled', relativeLinkResolution: 'legacy' }),
     BrowserAnimationsModule,
   ],
   providers: [],
