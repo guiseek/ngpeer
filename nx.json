@@ -25,6 +25,9 @@
   "projects": {
     "core": {
       "tags": []
+    },
+    "client": {
+      "tags": ["side:client"]
     }
   }
 }

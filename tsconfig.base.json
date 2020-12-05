@@ -16,7 +16,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@ngpeer/core": ["libs/core/src/index.ts"]
+      "@ngpeer/core": ["libs/core/src/index.ts"],
+      "@ngpeer/client": ["libs/client/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
