@@ -1,17 +1,9 @@
+import { createIceObject, createSdpObject, isChrome } from './client.utilities'
 import { Inject, Injectable, InjectionToken } from '@angular/core'
 import { ClientStoreService } from './client-store.service'
 import { MediaStreamService } from './media-stream.service'
 import { PeerAction, PeerClient } from '@ngpeer/core'
 import * as io from 'socket.io-client'
-import adapter from 'webrtc-adapter'
-
-declare global {
-  interface RTCPeerConnection {
-    onaddstream: (evt: MediaStreamEvent) => void
-    onremovestream: (evt: Event) => void
-    addStream(stream: MediaStream): void
-  }
-}
 
 export const CONFIG = new InjectionToken<string>('ClientConfig')
 
@@ -21,7 +13,7 @@ export const CONFIG = new InjectionToken<string>('ClientConfig')
 export class ClientConnectionService {
   private socket: SocketIOClient.Socket
   private peerConnections: RTCPeerConnection[] = []
-  private myMediaStream: MediaStream = undefined
+  private myMediaStream: MediaStream
   private peerId: string
 
   constructor(
@@ -36,94 +28,78 @@ export class ClientConnectionService {
       this.peerId = this.socket.id
     })
 
-    this.socket.on('disconnect', () => {
-      console.log('disconnect')
+    this.socket.on('disconnect', (data) => {
+      console.log('disconnect: ', data)
     })
 
     this.socket.on(PeerAction.Connected, ({ id }) => this.makeOffer(id))
     this.socket.on(PeerAction.Data, (data) => this.handlePeerData(data))
-    this.socket.on(PeerAction.Disconnected, (data) => console.log(data))
+    this.socket.on(PeerAction.Disconnected, ({ id }) => this.remove(id))
   }
 
-  private makeOffer(clientId: string) {
-    const peerConnection = this.getPeerConnection(clientId)
+  private async makeOffer(id: string) {
+    const peerConnection = this.getPeerConnection(id)
 
     const options: RTCOfferOptions = {
       offerToReceiveVideo: true,
       offerToReceiveAudio: true,
     }
 
-    peerConnection
-      .createOffer(options)
-      .then(async (sdp: RTCSessionDescriptionInit) => {
-        return peerConnection.setLocalDescription(sdp).then(() => {
-          this.socket.emit(PeerAction.Data, {
-            by: this.peerId,
-            to: clientId,
-            sdp: sdp,
-            type: PeerAction.Offer,
-          })
-        })
-      })
+    const sdp = await peerConnection.createOffer(options)
+    await peerConnection.setLocalDescription(sdp)
+    const data = createSdpObject(this.peerId, id, sdp, PeerAction.Offer)
+    this.socket.emit(PeerAction.Data, data)
   }
 
-  public connectToRoom() {
-    this.mediaStream
-      .getMediaStream()
-      .then((stream: MediaStream) => {
-        this.myMediaStream = stream
-        this.socket.emit(PeerAction.ConnectToRoom)
-
-        /**
-         * Add my self to the list */
-        this.clientStore.addClient(
-          new PeerClient({
-            id: this.socket.id,
-            stream: this.myMediaStream,
-          })
-        )
-      })
-      .catch((err) => console.error("Can't get media stream", err))
+  private remove(id: string) {
+    this.clientStore.removeClient(id)
   }
 
-  private handlePeerData(message) {
-    const peerConnection = this.getPeerConnection(message.by)
+  public async connectToRoom() {
+    const stream = await this.mediaStream.getMediaStream()
+    this.myMediaStream = stream
+    this.socket.emit(PeerAction.ConnectToRoom)
+    const client = new PeerClient({
+      id: this.socket.id,
+      stream: this.myMediaStream,
+      controls: true,
+      muted: true,
+    })
+    this.clientStore.addClient(client)
+    //.catch((err) => console.error("Can't get media stream", err))
+  }
 
-    switch (message.type) {
-      case PeerAction.Offer:
-        peerConnection
-          .setRemoteDescription(new RTCSessionDescription(message.sdp))
-          .then(() => {
-            console.log('Setting remote description by offer')
-            return peerConnection
-              .createAnswer()
-              .then((sdp: RTCSessionDescriptionInit) => {
-                return peerConnection.setLocalDescription(sdp).then(() => {
-                  this.socket.emit(PeerAction.Data, {
-                    by: this.peerId,
-                    to: message.by,
-                    sdp: sdp,
-                    type: PeerAction.Answer,
-                  })
-                })
-              })
-          })
-          .catch((err) => {
-            console.error('Error on SDP-Offer:', err)
-          })
+  private async handlePeerData({ type, by, sdp, ice }) {
+    const peerConnection = this.getPeerConnection(by)
+
+    switch (type) {
+      case PeerAction.Offer: {
+        const description = new RTCSessionDescription(sdp)
+        await peerConnection.setRemoteDescription(description)
+
+        console.log('Setting remote description by offer')
+
+        const answer = await peerConnection.createAnswer()
+        await peerConnection.setLocalDescription(answer)
+        const data = createSdpObject(this.peerId, by, answer, PeerAction.Answer)
+        this.socket.emit(PeerAction.Data, data)
         break
-      case PeerAction.Answer:
-        peerConnection
-          .setRemoteDescription(new RTCSessionDescription(message.sdp))
-          .then(() => console.log('Setting remote description by answer'))
-          .catch((err) => console.error('Error on SDP-Answer:', err))
+        /*catch((err) => {console.error('Error on SDP-Offer:', err)})*/
+      }
+
+      case PeerAction.Answer: {
+        const description = new RTCSessionDescription(sdp)
+        await peerConnection.setRemoteDescription(description)
         break
-      case PeerAction.Ice:
-        if (message.ice) {
+        /*.catch((err) => console.error('Error on SDP-Answer:', err))*/
+      }
+      case PeerAction.Ice: {
+        if (ice) {
           console.log('Adding ice candidate')
-          peerConnection.addIceCandidate(message.ice)
+          await peerConnection.addIceCandidate(ice)
         }
         break
+      }
     }
   }
 
@@ -135,34 +111,30 @@ export class ClientConnectionService {
     const peerConnection = new RTCPeerConnection()
     this.peerConnections[id] = peerConnection
 
-    peerConnection.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-      this.socket.emit(PeerAction.Data, {
-        by: this.peerId,
-        to: id,
-        ice: event.candidate,
-        type: PeerAction.Ice,
-      })
-    }
+    peerConnection.addEventListener('icecandidate', ({ candidate }) => {
+      const data = createIceObject(this.peerId, id, candidate, PeerAction.Ice)
+      this.socket.emit(PeerAction.Data, data)
+    })
 
-    peerConnection.onnegotiationneeded = () => {
+    peerConnection.addEventListener('negotiationneeded', () => {
       console.log('Need negotiation:', id)
-    }
+    })
 
-    peerConnection.onsignalingstatechange = () => {
+    peerConnection.addEventListener('signalingstatechange', () => {
       console.log(
         'ICE signaling state changed to:',
         peerConnection.signalingState,
         'for client',
         id
       )
-    }
+    })
 
     /**
      * @deprecated in Chrome
      * @see https://github.com/webrtc/adapter/issues/361
      * https://developer.mozilla.org/de/docs/Web/API/RTCPeerConnection/addStream
      */
-    if (adapter.browserDetails.browser.indexOf('chrome') > -1) {
+    if (isChrome) {
       //
       peerConnection.addStream(this.myMediaStream)
       peerConnection.onaddstream = ({ stream }) => {
@@ -171,17 +143,14 @@ export class ClientConnectionService {
         this.clientStore.addClient(client)
       }
     } else {
-      peerConnection.addTrack(
-        this.myMediaStream.getVideoTracks()[0],
-        this.myMediaStream
-      )
+      const [track] = this.myMediaStream.getVideoTracks()
+      peerConnection.addTrack(track, this.myMediaStream)
       peerConnection.ontrack = (event: RTCTrackEvent) => {
         console.log('Received new stream')
         const client = new PeerClient({ id: id, stream: event.streams[0] })
         this.clientStore.addClient(client)
       }
     }
-
     return peerConnection
   }
 }

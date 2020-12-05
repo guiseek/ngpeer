@@ -1,9 +1,20 @@
 import { PeerAction } from '@ngpeer/core'
 import { Client, Server, Socket } from 'socket.io'
-import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets'
+import {
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway,
+} from '@nestjs/websockets'
 
 @WebSocketGateway()
-export class AppGateway {
+export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  handleConnection(socket: Socket, ...args: any[]) {
+    console.log(`Client ${socket.id} connected to room`)
+  }
+  handleDisconnect(socket: Socket) {
+    socket.broadcast.emit(PeerAction.Disconnected, { id: socket.id })
+  }
 
   @SubscribeMessage(PeerAction.Data)
   onPeerMessage(socket: Socket, data: any) {
@@ -14,13 +25,6 @@ export class AppGateway {
   @SubscribeMessage(PeerAction.ConnectToRoom)
   onPeerConnect(socket: Socket, data: any) {
     console.log(`Client ${socket.id} connected to room`)
-    socket.broadcast.emit(PeerAction.Connected, {
-      id: socket.id,
-    })
-  }
-
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
-    return 'Hello world!'
+    socket.broadcast.emit(PeerAction.Connected, { id: socket.id })
   }
 }
