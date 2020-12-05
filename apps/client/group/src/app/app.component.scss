@@ -1,46 +1,25 @@
-/*
- * Remove template code below
- */
- :host {
+:host {
   display: flex;
-  flex-flow: column;
+  flex-direction: column;
   height: 100%;
-  max-width: 100vw;
-
-  --ux-grid-gap: 3rem;
-  --ux-grid-template-rows: 300px;
-  --ux-grid-template-columns: 320px;
-
-
-  ol {
-    display: grid;
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(var(--ux-grid-template-columns), 1fr)
-    );
-    grid-template-rows: repeat(6, var(--ux-grid-template-rows));
-    grid-gap: var(--ux-grid-gap);
-    grid-auto-flow: dense;
-    list-style: none;
-
-    > li:nth-child(4n) {
-      grid-column: span 2;
-      grid-row: span 2;
+  .mat-toolbar {
+    i.material-icons {
+      color: #ff9800;
+      margin: 12px;
     }
+  }
+  .mat-drawer-container {
+    flex: 1;
+  }
 
-    > li:nth-child(8n) {
-      grid-column: span 3;
-      grid-row: span 3;
-    }
+  video {
+    flex: 1;
+    max-width: 100%;
+  }
 
-    > li > figure {
-      height: 100%;
-    }
-
-    > li > figure > img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+  .mat-toolbar.footer {
+    justify-content: center;
+    align-items: center;
+    font-size: 95%;
   }
 }

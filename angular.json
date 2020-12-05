@@ -259,5 +259,5 @@
       "strict": true
     }
   },
-  "defaultProject": "server-group"
+  "defaultProject": "client-group"
 }
