@@ -1,0 +1,5 @@
+<ol cols="2" rowHeight="2:1">
+  <li *ngFor="let client of peerClients">
+    <video controls autoplay [srcObject]="client.stream"></video>
+  </li>
+</ol>

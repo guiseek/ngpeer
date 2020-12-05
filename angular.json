@@ -73,6 +73,126 @@
           "style": "scss"
         }
       }
+    },
+    "client-group": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "apps/client/group",
+      "sourceRoot": "apps/client/group/src",
+      "prefix": "sample",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/client/group",
+            "index": "apps/client/group/src/index.html",
+            "main": "apps/client/group/src/main.ts",
+            "polyfills": "apps/client/group/src/polyfills.ts",
+            "tsConfig": "apps/client/group/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "apps/client/group/src/favicon.ico",
+              "apps/client/group/src/assets"
+            ],
+            "styles": ["apps/client/group/src/styles.scss"],
+            "allowedCommonJsDependencies": [
+              "rtcpeerconnection-shim",
+              "socket.io-client"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/client/group/src/environments/environment.ts",
+                  "with": "apps/client/group/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "client-group:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "client-group:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "client-group:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/client/group/src/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/client/group/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "client-group-e2e": {
+      "root": "apps/client/group-e2e",
+      "sourceRoot": "apps/client/group-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/client/group-e2e/cypress.json",
+            "tsConfig": "apps/client/group-e2e/tsconfig.e2e.json",
+            "devServerTarget": "client-group:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "client-group:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/client/group-e2e/**/*.{js,ts}"]
+          }
+        }
+      }
     }
   },
   "cli": {
