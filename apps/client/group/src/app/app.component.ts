@@ -1,5 +1,6 @@
 import { PeerClient } from '@ngpeer/core'
 import { AfterViewInit, Component } from '@angular/core'
+import { BreakpointObserver } from '@angular/cdk/layout'
 import { ClientConnectionService, ClientStoreService } from '@ngpeer/client'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 
@@ -12,20 +13,20 @@ export class AppComponent implements AfterViewInit {
   title = 'client-group'
 
   public peerClients: PeerClient[]
-
-  photos = [
-    'assets/photo1.png',
-    'assets/photo2.png',
-    'assets/photo3.png',
-  ]
-
+  isSmallScreen = this.breakpointObserver.isMatched('(max-width: 599px)');
+  breakpoints$ = this.breakpointObserver.observe('')
   constructor(
-    private clientStoreService: ClientStoreService,
     private connectionService: ClientConnectionService,
+    private clientStoreService: ClientStoreService,
+    private breakpointObserver: BreakpointObserver,
     private sanitizer: DomSanitizer
   ) {
     this.clientStoreService.clients$.subscribe(
-      (clientList) => (this.peerClients = clientList.toArray()),
+      (clientList) => {
+        console.log(clientList);
+
+        this.peerClients = clientList.toArray()
+      },
       (err) => console.error('Error updating the client list:', err)
     )
   }
@@ -35,8 +36,10 @@ export class AppComponent implements AfterViewInit {
       URL.createObjectURL(stream)
     )
   }
-
+  connect() {
+    this.connectionService.connectToRoom()
+  }
   ngAfterViewInit(): void {
-    // this.connectionService.connectToRoom()
+
   }
 }

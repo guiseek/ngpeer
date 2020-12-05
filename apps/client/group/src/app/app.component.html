@@ -1,12 +1,25 @@
-<!-- <ol cols="2" rowHeight="2:1">
-  <li *ngFor="let client of peerClients">
-    <video [controls]="false" autoplay [srcObject]="client.stream"></video>
-  </li>
-</ol> -->
+<mat-toolbar color="primary">
+  <i class="material-icons">local_fire_department</i>
+  <h1>@ngpeer</h1>
 
-<ol class="grid">
-  <li class="tile" *ngFor="let photo of photos">
-    <img [src]="photo" alt="">
-  </li>
-</ol>
+  <span class="spacer"></span>
 
+  <button mat-raised-button color="accent" (click)="connect()">Entrar</button>
+</mat-toolbar>
+
+<mat-drawer-container
+  class="example-container"
+  [hasBackdrop]="true"
+>
+  <mat-drawer-content>
+    <mat-grid-list cols="2" rowHeight="2:1">
+      <mat-grid-tile *ngFor="let client of peerClients">
+        <video controls autoplay [srcObject]="client.stream"></video>
+      </mat-grid-tile>
+    </mat-grid-list>
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<mat-toolbar color="primary" class="footer">
+  <p>Guilherme 2020 &copy; email@guiseek.dev</p>
+</mat-toolbar>
