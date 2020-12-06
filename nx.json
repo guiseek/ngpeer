@@ -38,6 +38,9 @@
     },
     "server-group": {
       "tags": ["side:server"]
+    },
+    "ui": {
+      "tags": ["side:client", "type:ui"]
     }
   }
 }

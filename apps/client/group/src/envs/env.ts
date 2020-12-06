@@ -4,6 +4,7 @@
 
 export const env = {
   production: false,
+  apiGateway: 'http://localhost:3000'
 }
 
 /*
