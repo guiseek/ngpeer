@@ -4,10 +4,6 @@ import { ClientStoreService } from './client-store.service'
 import { MediaStreamService } from './media-stream.service'
 import { ClientConnectionService, CONFIG } from './client-connection.service'
 
-export { ClientStoreService }
-export { MediaStreamService }
-export { ClientConnectionService, CONFIG }
-
 @NgModule({
   imports: [CommonModule],
   providers: [MediaStreamService, ClientStoreService],
