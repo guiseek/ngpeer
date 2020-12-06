@@ -4,5 +4,6 @@ module.exports = {
     '<rootDir>/libs/client',
     '<rootDir>/apps/client/group',
     '<rootDir>/apps/server/group',
+    '<rootDir>/libs/ui',
   ],
 }

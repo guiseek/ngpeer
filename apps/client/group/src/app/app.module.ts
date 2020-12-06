@@ -1,36 +1,25 @@
+import { env } from './../envs/env';
 import { BrowserModule } from '@angular/platform-browser'
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core'
 
+import { UiModule, CdkModule, MaterialModule } from '@ngpeer/ui';
 import { ClientModule } from '@ngpeer/client'
 
 import { AppComponent } from './app.component'
 import { RouterModule } from '@angular/router';
-import { LayoutModule } from '@angular/cdk/layout';
-import { PlatformModule } from '@angular/cdk/platform';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatGridListModule } from '@angular/material/grid-list';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoaderComponent } from './loader/loader.component'
 
 @NgModule({
   declarations: [AppComponent, LoaderComponent],
   imports: [
-    LayoutModule,
+    UiModule,
+    CdkModule,
+    MaterialModule,
     BrowserModule,
-    MatIconModule,
-    MatCardModule,
-    PlatformModule,
-    MatButtonModule,
-    MatToolbarModule,
-    MatSidenavModule,
-    MatGridListModule,
     ReactiveFormsModule,
-    ClientModule.forRoot('https://ngpeer.vercel.app'),
+    ClientModule.forRoot(env.apiGateway),
     RouterModule.forRoot([], { initialNavigation: 'enabled', relativeLinkResolution: 'legacy' }),
     BrowserAnimationsModule,
   ],

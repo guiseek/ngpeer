@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'sample-loader',
@@ -8,9 +8,10 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 })
 export class LoaderComponent implements OnInit {
 
-  constructor() { }
+  constructor(private elRef: ElementRef<HTMLElement>) { }
 
   ngOnInit(): void {
+    console.log(this.elRef.nativeElement);
   }
 
 }
